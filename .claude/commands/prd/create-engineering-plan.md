@@ -14,6 +14,13 @@ Transform requirements into actionable plan that:
 - Tracks progress via YAML status (project management & tracking tool)
 </objective>
 
+<agent-usage>
+This command leverages specialized agents for efficiency:
+- **code-researcher**: Deep codebase analysis and understanding
+- **web-researcher**: Technical documentation and best practices research
+These agents work autonomously with their own context windows for better performance.
+</agent-usage>
+
 <process>
   <step_1_analyze>
     • Read requirements: $ARGUMENTS
@@ -24,28 +31,28 @@ Transform requirements into actionable plan that:
   </step_1_analyze>
 
   <step_2_context>
-    • Scan codebase structure
-    • Note architecture patterns
-    • Map dependencies
+    • Use Task tool with code-researcher agent for deep codebase analysis:
+      Task(
+        subagent_type="code-researcher",
+        description="Analyze codebase structure",
+        prompt="Provide comprehensive codebase analysis: structure, architecture patterns, dependencies, key components"
+      )
+    • Extract architecture patterns from analysis
+    • Map component relationships
   </step_2_context>
 
   <step_3_research>
-    <use_context7_mcp>
-      • Get latest framework docs (relevant to the project)
-      • Find best practices
-      • Verify API compatibility
-    </use_context7_mcp>
-    
-    <use_webfetch_if_needed>
-      • Extract from URLs with focused prompts
-      • GitHub: `gh api repos/owner/repo` or raw.githubusercontent.com
-      • Example: `WebFetch url="https://github.com/vercel/next.js" prompt="List main features"`
-    </use_webfetch_if_needed>
-    
-    <use_playwright_mcp_if_needed>
-      • Navigate JavaScript-heavy/dynamic sites
-      • Use: browser_navigate + browser_snapshot
-    </use_playwright_mcp_if_needed>
+    • Use Task tool with web-researcher agent for technical research:
+      Task(
+        subagent_type="web-researcher",
+        description="Research technologies and best practices",
+        prompt="Research framework documentation, best practices, and patterns for technologies identified in the project. Focus on official docs and current industry standards."
+      )
+    • Note: The web-researcher agent will automatically:
+      - Use Context7 MCP for framework documentation
+      - Use WebFetch for specific URLs and GitHub
+      - Use Playwright MCP for dynamic sites
+      - Prioritize official sources and recent information
   </step_3_research>
 
   <step_4_design>
