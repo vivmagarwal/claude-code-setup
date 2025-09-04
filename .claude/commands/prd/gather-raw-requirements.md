@@ -7,20 +7,39 @@ description: Guide creation of detailed product requirements document
 
 <task>Create detailed product requirements document through guided conversation</task>
 
+<agent-support>
+This command uses specialized agents when needed:
+- **code-researcher**: Analyzes existing codebase to understand context and related features
+- **web-researcher**: Researches similar implementations and best practices
+These agents provide autonomous research with independent context windows.
+</agent-support>
+
 <instructions>
 - Focus on understanding "what" and "why", not "how"
 - Ask clarifying questions before writing
 - Present options as numbered/lettered lists for easy selection
-- Save final document to .project-management/[name]-raw-requirements.md
+- Save final document to .claude-project-managment/[name]-raw-requirements.md
 - Target audience: junior developers (explicit, unambiguous requirements)
 </instructions>
 
 <process>
 1. Parse user input: $ARGUMENTS
-2. Ask clarifying questions systematically
-3. Gather responses iteratively
-4. Generate comprehensive raw requirements document
-5. Save to .project-management directory (this .project-management directory should be at root of the project at sibling to .claude directory)
+2. If existing project, use code-researcher agent to understand context:
+   Task(
+     subagent_type="code-researcher",
+     description="Analyze existing codebase",
+     prompt="Analyze current project structure and identify existing features related to the new requirement"
+   )
+3. Ask clarifying questions systematically
+4. Gather responses iteratively
+5. For technical research needs, use web-researcher agent:
+   Task(
+     subagent_type="web-researcher",
+     description="Research similar implementations",
+     prompt="Find examples and best practices for similar features"
+   )
+6. Generate comprehensive raw requirements document
+7. Save to .claude-project-managment directory (this .claude-project-managment directory should be at root of the project at sibling to .claude directory)
 </process>
 
 <clarifying-questions>
@@ -47,6 +66,7 @@ Example questions for existing projects:
 - Screenshots: Do you have any screenshots of the current system or desired outcome?
 - Acceptance Criteria: How will we know when this feature is successfully implemented? What are the key success criteria?
 
+Note: I can use the code-researcher agent to analyze your existing codebase and the web-researcher agent to find similar implementations if needed.
 </clarifying-questions-for-existing-projects>
 
 
