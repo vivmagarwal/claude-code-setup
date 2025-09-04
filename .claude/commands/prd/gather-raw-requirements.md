@@ -18,7 +18,7 @@ These agents provide autonomous research with independent context windows.
 - Focus on understanding "what" and "why", not "how"
 - Ask clarifying questions before writing
 - Present options as numbered/lettered lists for easy selection
-- Save final document to .project-management/[name]-raw-requirements.md
+- Save final document to .claude-project-managment/[name]-raw-requirements.md
 - Target audience: junior developers (explicit, unambiguous requirements)
 </instructions>
 
@@ -39,7 +39,7 @@ These agents provide autonomous research with independent context windows.
      prompt="Find examples and best practices for similar features"
    )
 6. Generate comprehensive raw requirements document
-7. Save to .project-management directory (this .project-management directory should be at root of the project at sibling to .claude directory)
+7. Save to .claude-project-managment directory (this .claude-project-managment directory should be at root of the project at sibling to .claude directory)
 </process>
 
 <clarifying-questions>
