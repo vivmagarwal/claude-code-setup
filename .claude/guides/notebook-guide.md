@@ -4,11 +4,15 @@
 
 When asking Claude Code to work with Jupyter notebooks, follow these fundamental principles:
 
-1. **Execute each cell before proceeding to the next**
-2. **No dirty patches or ugly fixes - only solid, reliable, robust code**
-3. **Verify outputs at each step**
-4. **Create all dependencies upfront**
-5. **Test incrementally, fix immediately**
+1. **Always create and enable a UV environment first**
+2. **Make each cell as independent as possible**
+3. **Install all dependencies in the first cells using `!uv pip install`**
+4. **Execute each cell before proceeding to the next**
+5. **No dirty patches or ugly fixes - only solid, reliable, robust code**
+6. **Verify outputs at each step**
+7. **Create all dependencies upfront**
+8. **Test incrementally, fix immediately**
+9. **Research thoroughly using available tools before implementation**
 
 ---
 
@@ -20,11 +24,18 @@ When asking Claude Code to work with Jupyter notebooks, follow these fundamental
 Create a Jupyter notebook for [specific task].
 
 Requirements:
-1. Execute each cell sequentially before writing the next
-2. Show the output of each cell execution
-3. If a cell fails, fix it completely before proceeding
-4. No quick fixes or workarounds - write production-quality code
-5. Create all required data files before starting
+1. First cells MUST install dependencies using !uv pip install
+2. Each cell should be as independent as possible
+3. Execute each cell sequentially before writing the next
+4. Show the output of each cell execution
+5. If a cell fails, fix it completely before proceeding
+6. No quick fixes or workarounds - write production-quality code
+7. Create all required data files before starting
+
+Cell Structure:
+- Cell 1: UV environment setup and kernel installation
+- Cell 2-3: Dependency installation using !uv pip install
+- Cell 4+: Implementation with independent, self-contained logic
 
 Validation:
 - After each cell: "Cell X executed successfully with output: [summary]"
@@ -111,16 +122,46 @@ Continue this pattern, executing each cell before writing the next"
 
 ## 🛠️ Claude Code Notebook Workflow
 
-### Step 1: Environment Setup
+### Step 1: UV Environment Setup
 ```
-Ensure environment is ready:
-1. Check Python version compatibility
-2. Install required packages
-3. Verify Jupyter is available
-4. Create virtual environment if needed
+ALWAYS start with UV environment:
+1. Create UV environment: uv venv
+2. Activate UV environment in notebook
+3. First notebook cell MUST be: !uv pip install jupyter ipykernel
+4. Second/third cells: Install all project dependencies with !uv pip install
+5. Use UV for ALL package installations: !uv pip install <package>
+6. Register kernel: !python -m ipykernel install --user --name=.venv
+
+Critical: Installing dependencies in the first cells ensures each cell
+can run independently and the notebook is reproducible.
 ```
 
-### Step 2: Data Creation
+### Step 2: Research and Discovery
+```
+Before implementing, research thoroughly:
+1. Use MCP tools to search for best practices and examples
+2. Use IDE MCP to:
+   - Get diagnostics from VS Code
+   - Execute code in Jupyter kernel (executeCode)
+   - Explore existing codebase patterns
+3. Use Perplexity/WebSearch for latest documentation
+4. Use Context7 for library-specific documentation
+5. Use GitHub MCP for finding code examples in repositories
+6. For web scraping needs: Use claude-scripts/ccpro.py if necessary
+7. Document findings before implementation
+
+IDE MCP Integration:
+- Use executeCode to test code snippets in the active kernel
+- Use getDiagnostics to check for errors and warnings
+- Leverage VS Code integration for better code quality
+
+Web Scraping (if needed):
+- Use the CCPro script at claude-scripts/ccpro.py
+- Example: from claude_scripts.ccpro import crawl
+- Supports interactive authentication and deep crawling
+```
+
+### Step 3: Data Creation
 ```
 Before writing any notebook code:
 1. Generate all CSV/JSON files needed
@@ -129,17 +170,24 @@ Before writing any notebook code:
 4. Document data schema
 ```
 
-### Step 3: Incremental Development
+### Step 4: Incremental Development
 ```
 For each notebook cell:
-1. Write the cell code
-2. Execute using: python -c "[cell code]"
-3. Capture and verify output
-4. Fix any issues completely
-5. Only then proceed to next cell
+1. Write the cell code (ensure it's as self-contained as possible)
+2. For dependency cells: Use !uv pip install in the cell itself
+3. Execute using: python -c "[cell code]" or in notebook directly
+4. Capture and verify output
+5. Fix any issues completely
+6. Only then proceed to next cell
+
+Cell Independence Guidelines:
+- Each cell should be re-runnable without depending on variable state
+- Import statements can be repeated in cells that use them
+- Avoid relying on mutable global state between cells
+- Data loading should be explicit in each cell that needs it
 ```
 
-### Step 4: Full Validation
+### Step 5: Full Validation
 ```
 After all cells are written:
 1. Save complete notebook
@@ -152,6 +200,19 @@ After all cells are written:
 ---
 
 ## 💪 Robust Code Standards
+
+### UV Package Installation
+```python
+# ❌ Bad - using system pip
+!pip install pandas numpy scikit-learn
+
+# ✅ Good - using UV in notebook
+!uv pip install pandas numpy scikit-learn matplotlib seaborn
+
+# For notebooks, ALWAYS use UV:
+!uv pip install jupyter ipykernel
+!uv pip install -r requirements.txt  # if requirements file exists
+```
 
 ### Import Management
 ```python
@@ -216,12 +277,15 @@ print(f"Model trained on {X.shape[0]} samples with {X.shape[1]} features")
 Create a data analysis notebook for customer churn analysis.
 
 Setup:
-1. First create customer_data.csv with 1000 rows
+1. Cell 1: Install jupyter and ipykernel using !uv pip install
+2. Cells 2-3: Install all analysis packages using !uv pip install pandas numpy matplotlib seaborn scikit-learn
+3. First create customer_data.csv with 1000 rows
    - Columns: customer_id, age, tenure, monthly_charges, total_charges, churn
-2. Execute each analysis cell and show output
-3. No deprecated functions or warnings
+4. Execute each analysis cell and show output
+5. No deprecated functions or warnings
 
 Quality standards:
+- Each cell must be independently runnable
 - Each visualization must display properly
 - All statistics must be calculated correctly
 - Code must follow PEP 8 style
@@ -235,9 +299,11 @@ Confirm each cell executes before proceeding to next.
 Build a complete ML pipeline notebook.
 
 Requirements:
-1. Generate synthetic classification dataset (1000 samples, 10 features)
-2. Cell-by-cell execution with output verification:
-   - Imports and setup
+1. Cell 1: !uv pip install jupyter ipykernel
+2. Cell 2: !uv pip install scikit-learn pandas numpy matplotlib seaborn
+3. Generate synthetic classification dataset (1000 samples, 10 features)
+4. Cell-by-cell execution with output verification:
+   - Imports and setup (can be repeated in cells that need them)
    - Data loading and validation
    - EDA with visualizations
    - Feature engineering
@@ -246,6 +312,7 @@ Requirements:
    - Predictions on test set
 
 Standards:
+- Each cell must be self-contained and re-runnable
 - Use only stable sklearn APIs
 - Proper train/test split
 - No data leakage
