@@ -48,7 +48,7 @@ These agents operate with independent context windows for optimal performance.
       prompt="Analyze entire codebase: Identify if fullstack, backend-only, or frontend-only. Document all API endpoints, data models, services, frontend components. Extract dependencies, architecture patterns, data flows. Determine optimal teaching progression. Miss nothing."
     )
 
-    Document in .claude-project-management/TEACHING-CONTEXT.yaml
+    Document in .project-management/TEACHING-CONTEXT.yaml
   </phase_1_discovery>
 
   <phase_2_research>
@@ -71,7 +71,7 @@ These agents operate with independent context windows for optimal performance.
   </phase_3_verification>
 
   <phase_4_plan_generation>
-    Generate: .claude-project-management/TEACHING-PLAN.md
+    Generate: .project-management/TEACHING-PLAN.md
     WITH ALL 10 STEPS DEFINED UPFRONT
   </phase_4_plan_generation>
 
@@ -434,7 +434,7 @@ After EVERY step completion:
 
 <output-structure>
 ```
-.claude-project-management/
+.project-management/
 ├── TEACHING-PLAN.md          # Master plan with live status (ALL STEPS DEFINED)
 ├── TEACHING-CONTEXT.yaml     # Codebase analysis and progress
 ├── FILES_CHANGED.yaml        # Complete file modification history
