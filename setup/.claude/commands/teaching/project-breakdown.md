@@ -1,6 +1,6 @@
 ---
-name: create-teaching-plan
-description: Transform project into 10-step teaching journey for beginners with backend-first approach
+name: project-breakdown
+description: Break down complex projects into 10 progressive, testable steps
 argument-hint: [project-path or leave blank for current project]
 ---
 

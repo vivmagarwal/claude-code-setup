@@ -18,19 +18,21 @@ This will add:
 ## What's Included
 
 ### Custom Commands
-- `/prd:create-engineering-plan` - Convert product requirements into actionable engineering plans
-- `/prd:gather-raw-requirements` - Guide creation of detailed product requirements
-- `/teaching:create-teaching-plan` - Transform projects into 10-step teaching journeys
+- `/presentation:architect` - Create complete presentations from any source
+- `/presentation:brand-strategist` - Interactive brand guidelines builder
+- `/prd:create-engineering-plan` - Convert requirements to engineering plans
+- `/prd:gather-raw-requirements` - Guide for detailed requirements docs
+- `/teaching:project-breakdown` - Break complex projects into 10 incremental steps
 - `/utils:configure-claude-code` - Configure Claude Code features
 
 ### Sub-Agents
-- **code-researcher** - Deep codebase analysis specialist
-- **web-researcher** - Documentation and technical research specialist
+- **code-researcher** - Deep codebase analysis
+- **web-researcher** - Documentation research
 
 ### Guides
-- Prompting guide for effective Claude interactions
-- Notebook guide for Jupyter workflows
-- Research guides for code and web investigation
+- Prompting guide - Write effective Claude prompts
+- Notebook guide - Jupyter workflow tips
+- Research guides - Code and web investigation
 
 ## Philosophy
 
