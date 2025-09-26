@@ -290,7 +290,7 @@ Example: "corporate modern style with #2E4057 navy and #66B2FF blue accents, cle
 
 <guidelines>
 - Keep ALL useful content from source
-- Apply 6x6 rule strictly (split if needed)
+- Apply 6x6 rule strictly (split into multiple slides if needed)
 - ALWAYS prepend universal style to image prompts
 - Ensure high contrast and accessibility
 - Write CRISP speaker notes for smooth delivery
