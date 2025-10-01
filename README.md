@@ -10,6 +10,16 @@ Install the Claude Code setup in your project:
 npx degit vivmagarwal/claude-code-setup/setup .
 ```
 
+## Important: API Key Configuration
+
+**If `ANTHROPIC_API_KEY` is found in your environment, it will be used instead of your Claude Code subscription.** To avoid unexpected API usage charges, regularly run:
+
+```bash
+unset ANTHROPIC_API_KEY
+```
+
+Before starting any Claude Code session. For more information, see the [official documentation on managing API key environment variables](https://support.claude.com/en/articles/12304248-managing-api-key-environment-variables-in-claude-code).
+
 This will add:
 - `.claude/` - Commands, agents, guides, and settings
 - `.project-management/` - Directory for engineering plans
