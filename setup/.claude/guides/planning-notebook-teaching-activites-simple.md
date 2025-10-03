@@ -20,6 +20,7 @@ For each activity, provide:
 
 Design activities that:
 - Start simple and gradually increase in complexity
+- Each topic and concepts within the topic could have several activites if needed
 - Progress from concrete examples to deeper understanding
 - Build upon each other logically
 - Are appropriate for someone with zero prior knowledge
