@@ -147,7 +147,7 @@ Before implementing, research thoroughly:
 3. Use Perplexity/WebSearch for latest documentation
 4. Use Context7 for library-specific documentation
 5. Use GitHub MCP for finding code examples in repositories
-6. For web scraping needs: Use claude-scripts/ccpro.py if necessary
+6. For web scraping needs: Use .claude-scripts/ccpro.py if necessary
 7. Document findings before implementation
 
 IDE MCP Integration:
@@ -156,7 +156,7 @@ IDE MCP Integration:
 - Leverage VS Code integration for better code quality
 
 Web Scraping (if needed):
-- Use the CCPro script at claude-scripts/ccpro.py
+- Use the CCPro script at .claude-scripts/ccpro.py
 - Example: from claude_scripts.ccpro import crawl
 - Supports interactive authentication and deep crawling
 ```
