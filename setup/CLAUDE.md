@@ -28,3 +28,5 @@ When implementing features using an engineering plan document:
 - When encountering blockers: Document issue and resolution
 
 Remember: A new developer should be able to continue work using ONLY the codebase and engineering plan.
+
+Also: self correct & update this file (CLAUDE.md) if needed. Remeber that this file will always be in context with all the llm calls. so keep it short, yet super relevant.
