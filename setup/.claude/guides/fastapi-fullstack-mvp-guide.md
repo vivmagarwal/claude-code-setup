@@ -4,12 +4,12 @@
 
 1. **Single file backend** - Keep all FastAPI code in one Python file that serves frontend at root (/)
 2. **Single file frontend** - HTML/CSS/JS in `frontend/index.html` with CDN libraries (no build steps)
-3. **Single port deployment** - Backend serves frontend, everything runs on port 8000
+3. **Single port deployment** - Backend serves frontend, everything runs on one port (default: 8000, auto-selects if busy)
 4. **Root-level environment** - All API keys in root `.env` file
 5. **Independently sharable** - Each project runs standalone with pip
 6. **Professional UI** - Clean, functional, great UX with Tailwind CSS
 
-**Key Architecture:** The backend uses `FileResponse` to serve the frontend HTML from the root endpoint (/), eliminating the need for separate static file servers or template directories. This means one command (`python app.py`) runs everything.
+**Key Architecture:** The backend uses `FileResponse` to serve the frontend HTML from the root endpoint (/), eliminating the need for separate static file servers or template directories. This means one command (`python app.py`) runs everything. Use automatic port selection (see Advanced Patterns) to avoid port conflicts when running multiple apps.
 
 ## Quick Start
 
@@ -107,13 +107,33 @@ async def chat(request: ChatRequest):
 async def health():
     """Health check endpoint."""
     return {"status": "healthy"}
+
+# Automatic port selection (avoids conflicts when running multiple apps)
+def find_available_port(start_port=8000, max_attempts=10):
+    """Find an available port starting from start_port"""
+    import socket
+    for port in range(start_port, start_port + max_attempts):
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.bind(('0.0.0.0', port))
+                return port
+        except OSError:
+            continue
+    raise RuntimeError(f"Could not find available port in range {start_port}-{start_port + max_attempts}")
+
+if __name__ == "__main__":
+    import uvicorn
+    port = find_available_port(8000)
+    print(f"🚀 Starting server on http://localhost:{port}")
+    uvicorn.run(app, host="0.0.0.0", port=port)
 ```
 
-**Key Changes:**
+**Key Features:**
 - Frontend served directly from root endpoint (/) using `FileResponse`
 - No need for `StaticFiles` mount or templates directory
 - Frontend in `frontend/index.html` (single file)
-- Everything runs on one port (default: 8000)
+- Automatic port selection (tries 8000-8009, shows which port is used)
+- Single command to run: `python app.py`
 
 ### 4. Setup Frontend (frontend/index.html)
 
@@ -895,7 +915,7 @@ async def search_restaurants(query: str):
 8. **Professional UI** with Tailwind CSS
 9. **Complete README** with setup instructions
 10. **Independently sharable** with pip
-11. **Single port deployment** - everything on port 8000
+11. **Single port deployment** - defaults to port 8000, auto-selects if busy (see Advanced Patterns)
 
 ## Development Workflow
 
