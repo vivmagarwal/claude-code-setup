@@ -2,11 +2,14 @@
 
 ## Core Principles
 
-1. **Single file backend** - Keep all FastAPI code in one Python file
-2. **Plain frontend** - HTML/CSS/JS with CDN libraries (no build steps)
-3. **Root-level environment** - All API keys in root `.env` file
-4. **Independently sharable** - Each project runs standalone with pip
-5. **Professional UI** - Clean, functional, great UX with Tailwind CSS
+1. **Single file backend** - Keep all FastAPI code in one Python file that serves frontend at root (/)
+2. **Single file frontend** - HTML/CSS/JS in `frontend/index.html` with CDN libraries (no build steps)
+3. **Single port deployment** - Backend serves frontend, everything runs on port 8000
+4. **Root-level environment** - All API keys in root `.env` file
+5. **Independently sharable** - Each project runs standalone with pip
+6. **Professional UI** - Clean, functional, great UX with Tailwind CSS
+
+**Key Architecture:** The backend uses `FileResponse` to serve the frontend HTML from the root endpoint (/), eliminating the need for separate static file servers or template directories. This means one command (`python app.py`) runs everything.
 
 ## Quick Start
 
@@ -20,17 +23,15 @@ For other Python tasks, use `/apps/` directory for simple scripts.
 
 ```
 full_stack_projects/<relevant-app-name>/
-├── app.py              # All backend code
-├── static/             # Frontend assets
-│   ├── index.html      # Main UI (or use templates/)
-│   ├── css/
-│   ├── js/
-│   └── images/
-├── templates/          # Optional: Jinja2 templates
+├── app.py              # All backend code (serves frontend at root)
+├── frontend/           # Frontend directory
+│   └── index.html      # Main UI (single file)
 ├── requirements.txt    # Pinned dependencies
 ├── .env.example        # Example env vars
 └── README.md           # Setup instructions
 ```
+
+**Note:** The backend serves the frontend directly from the root endpoint (/), eliminating the need for a separate static file server or template directory.
 
 ## Step-by-Step Workflow
 
@@ -53,17 +54,17 @@ Ask for details if not provided:
 ```bash
 cd full_stack_projects
 mkdir <relevant-app-name> && cd <relevant-app-name>
-mkdir -p static/{css,js,images}
-touch app.py requirements.txt .env.example README.md
+mkdir -p frontend
+touch app.py requirements.txt .env.example README.md frontend/index.html
 ```
 
 ### 3. Setup Backend (app.py)
 
 ```python
 from fastapi import FastAPI, HTTPException
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
+from pathlib import Path
 import os
 from dotenv import load_dotenv
 
@@ -72,8 +73,9 @@ load_dotenv("../../.env")
 
 app = FastAPI(title="<relevant-app-name>")
 
-# Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Paths
+FRONTEND_DIR = Path("frontend")
+FRONTEND_HTML = FRONTEND_DIR / "index.html"
 
 # Models
 class ChatRequest(BaseModel):
@@ -82,13 +84,15 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     reply: str
 
-# Routes
-@app.get("/", response_class=HTMLResponse)
-async def get_root():
-    """Serve main page."""
-    with open("static/index.html", "r") as f:
-        return HTMLResponse(content=f.read())
+# Serve Frontend
+@app.get("/")
+async def serve_frontend():
+    """Serve the frontend HTML file."""
+    if FRONTEND_HTML.exists():
+        return FileResponse(str(FRONTEND_HTML))
+    raise HTTPException(status_code=404, detail="Frontend not found")
 
+# API Routes
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     """Main API endpoint."""
@@ -105,7 +109,13 @@ async def health():
     return {"status": "healthy"}
 ```
 
-### 4. Setup Frontend (static/index.html)
+**Key Changes:**
+- Frontend served directly from root endpoint (/) using `FileResponse`
+- No need for `StaticFiles` mount or templates directory
+- Frontend in `frontend/index.html` (single file)
+- Everything runs on one port (default: 8000)
+
+### 4. Setup Frontend (frontend/index.html)
 
 **Option A: Plain HTML/JS**
 
@@ -371,7 +381,7 @@ Brief description of what the app does.
 
 ## API Endpoints
 
-- `GET /` - Main UI
+- `GET /` - Serves frontend HTML (single endpoint for UI)
 - `POST /api/chat` - Chat endpoint
 - `GET /api/health` - Health check
 
@@ -669,23 +679,223 @@ if missing_keys:
 ### Problem: CORS errors
 **Solution:** Add CORS middleware (see Security section)
 
-### Problem: Static files not loading
-**Solution:** Check `app.mount()` path matches directory structure
+### Problem: Frontend not loading
+**Solution:** Ensure `frontend/index.html` exists and path in app.py is correct
 
 ### Problem: Port already in use
-**Solution:** Use different port: `uvicorn app:app --port 8001`
+**Solution:** Add automatic port selection (see Advanced Patterns section below)
+
+## Advanced Patterns
+
+### Automatic Port Selection
+
+When running multiple apps simultaneously, automatically find available ports:
+
+```python
+def find_available_port(start_port=8000, max_attempts=10):
+    """Find an available port starting from start_port"""
+    import socket
+    for port in range(start_port, start_port + max_attempts):
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.bind(('0.0.0.0', port))
+                return port
+        except OSError:
+            continue
+    raise RuntimeError(f"Could not find available port in range {start_port}-{start_port + max_attempts}")
+
+if __name__ == "__main__":
+    import uvicorn
+    port = find_available_port(8000)
+    print(f"🚀 Starting server on http://localhost:{port}")
+    uvicorn.run(app, host="0.0.0.0", port=port)
+```
+
+**Benefits:**
+- No port conflicts when running multiple apps
+- Automatically tries ports 8000-8009 (configurable)
+- Shows which port was selected
+
+### Dynamic API URLs (Multi-Port Frontend)
+
+Always use dynamic API URLs in frontend to support different ports:
+
+```javascript
+// ❌ Bad - Hardcoded port
+const API_BASE_URL = 'http://localhost:8000/api';
+
+// ✅ Good - Dynamic based on current page
+const API_BASE_URL = `${window.location.origin}/api`;
+```
+
+**Why this matters:**
+- Works on any port (8000, 8001, 8002...)
+- Works in production (different domains)
+- No CORS issues
+- No frontend code changes needed when port changes
+
+### Custom Loading Animations
+
+For better user feedback, implement custom CSS animations when Tailwind utilities aren't sufficient:
+
+```html
+<style>
+    /* Circular pulsing animation for icons */
+    @keyframes circularPulse {
+        0% { transform: scale(1) translate(0, 0); }
+        25% { transform: scale(1.2) translate(2px, -2px); }
+        50% { transform: scale(1) translate(2px, 2px); }
+        75% { transform: scale(1.2) translate(-2px, 2px); }
+        100% { transform: scale(1) translate(0, 0); }
+    }
+
+    .search-icon-animated {
+        display: inline-block;
+        animation: circularPulse 1s ease-in-out infinite;
+    }
+</style>
+
+<!-- Usage -->
+<div class="search-icon-animated">🔍</div>
+```
+
+**JavaScript-based animation** (when CSS doesn't work):
+
+```javascript
+// Animated dots: Searching → Searching. → Searching.. → Searching...
+let dots = '';
+const loadingInterval = setInterval(() => {
+    dots = dots.length >= 3 ? '' : dots + '.';
+    button.textContent = 'Searching' + dots;
+}, 400);
+
+// Clear when done
+clearInterval(loadingInterval);
+```
+
+**Best practices:**
+- Use CSS animations for visual effects (rotating, pulsing)
+- Use JavaScript for text/content updates
+- Always provide visual feedback during async operations
+- Test animations work across browsers
+
+### Student-Friendly Free APIs
+
+Prioritize APIs with generous free tiers for educational projects:
+
+```python
+# ✅ Free tier options
+
+# Google Gemini (Free: 15 RPM, 1M TPM, 1500 RPD)
+import google.generativeai as genai
+genai.configure(api_key=GEMINI_API_KEY)
+model = genai.GenerativeModel('gemini-2.0-flash-exp')
+
+# Groq (Free: 30 RPM, 6K TPM, 1K RPD)
+from langchain_groq import ChatGroq
+llm = ChatGroq(model="llama-3.3-70b-versatile")
+
+# Tavily Search (Free: 1000 searches/month)
+from tavily import AsyncTavilyClient
+client = AsyncTavilyClient(api_key=TAVILY_API_KEY)
+```
+
+**Cost tracking in documentation:**
+
+```markdown
+## API Costs
+
+**💰 Total Cost: $0 (Free tier)**
+
+APIs used:
+- Tavily: 1000 searches/month free
+- Google Gemini Flash: 15 RPM, 1M TPM, 1500 RPD free
+- Groq: 30 RPM, 6K TPM, 1K RPD free
+
+Perfect for students and learning!
+```
+
+### Testing with Playwright MCP
+
+Add comprehensive testing using Playwright MCP server:
+
+```python
+# Test with Playwright MCP
+# 1. Navigate to app
+await mcp__playwright__browser_navigate(url="http://localhost:8000")
+
+# 2. Fill form
+await mcp__playwright__browser_type(
+    element="search input",
+    ref="e18",
+    text="test query"
+)
+
+# 3. Click button
+await mcp__playwright__browser_click(
+    element="search button",
+    ref="e19"
+)
+
+# 4. Verify results loaded
+# Check page snapshot for expected content
+```
+
+**Testing checklist:**
+- ✅ Page loads without errors
+- ✅ Forms accept input
+- ✅ Buttons trigger actions
+- ✅ Loading states show correctly
+- ✅ Results display properly
+- ✅ Error handling works
+
+### Async API Patterns
+
+Use parallel API calls for better performance:
+
+```python
+import asyncio
+
+async def search_restaurants(query: str):
+    # Search multiple APIs in parallel
+    tavily_task = search_tavily(query)
+    gemini_task = search_gemini(query)
+
+    # Wait for all to complete
+    tavily_results, gemini_results = await asyncio.gather(
+        tavily_task,
+        gemini_task,
+        return_exceptions=True
+    )
+
+    # Handle errors gracefully
+    if isinstance(tavily_results, Exception):
+        tavily_results = []
+    if isinstance(gemini_results, Exception):
+        gemini_results = []
+
+    # Merge and return
+    return merge_results(tavily_results, gemini_results)
+```
+
+**Benefits:**
+- Faster response times (parallel vs sequential)
+- Graceful error handling
+- Better user experience
 
 ## Summary
 
 1. **Create only when explicitly requested**
 2. **Use `/full_stack_projects/` directory**
-3. **Single file backend** (app.py)
-4. **Plain HTML/JS or React via CDN** (no build steps)
-5. **Root `.env` for all API keys**
-6. **Pin all dependencies** in requirements.txt
-7. **Professional UI** with Tailwind CSS
-8. **Complete README** with setup instructions
-9. **Independently sharable** with pip
+3. **Single file backend** (app.py) - serves frontend at root (/)
+4. **Single file frontend** (frontend/index.html) - served by backend
+5. **Plain HTML/JS or React via CDN** (no build steps)
+6. **Root `.env` for all API keys**
+7. **Pin all dependencies** in requirements.txt
+8. **Professional UI** with Tailwind CSS
+9. **Complete README** with setup instructions
+10. **Independently sharable** with pip
+11. **Single port deployment** - everything on port 8000
 
 ## Development Workflow
 
@@ -697,23 +907,30 @@ cd full_stack_projects && mkdir <relevant-app-name> && cd <relevant-app-name>
 uv venv && source .venv/bin/activate
 
 # 3. Create files
-# - app.py (backend)
-# - static/index.html (frontend)
-# - requirements.txt
-# - .env.example
-# - README.md
+mkdir -p frontend
+touch app.py requirements.txt .env.example README.md frontend/index.html
 
-# 4. Install dependencies
+# 4. Write code
+# - app.py: Backend with FileResponse at root (/)
+# - frontend/index.html: Single-file UI with CDN libraries
+
+# 5. Install dependencies
 uv pip install -r requirements.txt
 
-# 5. Configure environment
+# 6. Configure environment
 # Ensure root .env has required keys
 
-# 6. Run
-uvicorn app:app --reload
+# 7. Run (single command, single port)
+python app.py
+# Or: uvicorn app:app --reload
 
-# 7. Test
-# Open http://localhost:8000
+# 8. Test
+# Open http://localhost:8000 (frontend served from root)
 ```
+
+**Key Benefits:**
+- ✅ No separate frontend server needed
+- ✅ Simple deployment (just run app.py)
+- ✅ Clean project structure
 
 Remember: Keep it simple, keep it clean, make it work. no hacky patches. simple yet solid, reliable, robust code.
