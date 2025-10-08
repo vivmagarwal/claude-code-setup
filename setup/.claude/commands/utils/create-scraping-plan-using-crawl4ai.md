@@ -38,6 +38,10 @@ Ask the user for the following information ONE AT A TIME (conversational approac
 
 ### 3. Content Requirements
 - What content to extract? (articles, products, documentation, tables, etc.)
+- **Content filtering for LLM readiness:**
+  - Extract only main content (remove navigation, headers, footers, ads, sidebars)?
+  - Or extract full page content?
+  - Any specific elements to exclude? (e.g., comments, related articles, etc.)
 - Output format preferences (Markdown, JSON, HTML, or combination)
 - Specific data fields needed? (titles, dates, authors, prices, etc.)
 - Should media be extracted? (images, videos, downloads)
@@ -84,21 +88,37 @@ Research comprehensive Crawl4AI documentation from these sources:
 
 5. **Content Extraction**: https://docs.crawl4ai.com/core/markdown-generation/
    - Markdown generation strategies
-   - Content filtering options
+   - **PruningContentFilter** for LLM-ready content (removes boilerplate)
+   - **CSS selectors** and **XPath** for precise extraction
+   - **excluded_tags** parameter for filtering out unwanted elements
+   - Content filtering options and thresholds
    - Data extraction methods
    - File saving approaches
 
-6. **GitHub Repository**: https://github.com/unclecode/crawl4ai
+6. **Latest & Greatest Features**:
+   - AI-powered extraction capabilities
+   - Advanced content filtering (BM25, cosine similarity)
+   - Screenshot capabilities
+   - JavaScript execution
+   - Custom extraction strategies
+   - Streaming and chunking for large sites
+   - Session management and caching
+   - iframe processing options
+
+7. **GitHub Repository**: https://github.com/unclecode/crawl4ai
    - Latest version number
    - Recent examples in examples/ directory
    - Latest release notes
    - Breaking changes in recent versions
+   - New features in latest releases
 
 Provide:
 - Current version number
+- **Latest features and capabilities** (especially content filtering)
 - Best authentication method for login-protected sites
 - URL discovery strategies
-- Content extraction capabilities
+- **LLM-ready content extraction** options (PruningContentFilter, excluded_tags, CSS selectors)
+- **Content filtering approaches** (main content vs full page)
 - Complete code examples from official docs
 - Links to all referenced documentation pages
 """
@@ -322,19 +342,144 @@ async def discover_urls():
 ```
 
 #### 5. Main Crawling Script
+
+**Option A: LLM-Ready Content (Main Content Only)**
+
+For clean, LLM-ready markdown with navigation/headers/footers removed:
+
 ```python
-# Full, production-ready script
-# Current API methods from docs
-# Content extraction configuration
-# File saving logic
-# Error handling and retry mechanisms
+from crawl4ai import AsyncWebCrawler, BrowserConfig, CrawlerRunConfig
+from crawl4ai import DefaultMarkdownGenerator, PruningContentFilter
 
 async def main():
     """
-    Main crawling orchestration.
+    Main crawling orchestration with LLM-ready content filtering.
+    Extracts only main content, removes navigation, headers, footers, ads.
     """
-    # [Complete, runnable code]
-    pass
+    # Configure browser with authentication if needed
+    browser_config = BrowserConfig(
+        headless=True,
+        storage_state="auth_state.json"  # If authentication required
+    )
+
+    # Configure content extraction for LLM readiness
+    crawl_config = CrawlerRunConfig(
+        # Use PruningContentFilter to remove boilerplate
+        content_filter=PruningContentFilter(
+            threshold=0.5,  # Adjust threshold for content relevance
+            threshold_type="fixed"
+        ),
+
+        # Use markdown generator for clean output
+        markdown_generator=DefaultMarkdownGenerator(
+            options={
+                "ignore_links": False,  # Keep links in markdown
+                "body_width": 0  # No text wrapping
+            }
+        ),
+
+        # Wait for dynamic content
+        wait_until="networkidle",
+        delay_before_return_html=2.0,
+
+        # Process iframes if needed
+        process_iframes=True,
+
+        # Remove specific elements (customize based on target site)
+        excluded_tags=['nav', 'header', 'footer', 'aside', 'script', 'style'],
+        exclude_external_links=True,
+
+        # Cache configuration
+        cache_mode=CacheMode.ENABLED
+    )
+
+    async with AsyncWebCrawler(config=browser_config) as crawler:
+        # Crawl single page
+        result = await crawler.arun(
+            url="[TARGET_URL]",
+            config=crawl_config
+        )
+
+        if result.success:
+            # Save clean markdown
+            with open("output.md", "w") as f:
+                f.write(result.markdown)
+
+            print(f"✓ Extracted clean content: {len(result.markdown)} chars")
+        else:
+            print(f"✗ Crawl failed: {result.error_message}")
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())
+```
+
+**Option B: Full Page Content**
+
+For complete page content without filtering:
+
+```python
+from crawl4ai import AsyncWebCrawler, BrowserConfig, CrawlerRunConfig
+
+async def main():
+    """
+    Crawl with full page content (no filtering).
+    """
+    browser_config = BrowserConfig(headless=True)
+
+    # Minimal config for full content
+    crawl_config = CrawlerRunConfig(
+        wait_until="networkidle",
+        process_iframes=True
+    )
+
+    async with AsyncWebCrawler(config=browser_config) as crawler:
+        result = await crawler.arun(
+            url="[TARGET_URL]",
+            config=crawl_config
+        )
+
+        if result.success:
+            # Save full HTML and markdown
+            with open("output_full.html", "w") as f:
+                f.write(result.html)
+            with open("output_full.md", "w") as f:
+                f.write(result.markdown)
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())
+```
+
+**Option C: Custom Element Selection**
+
+For precise control over what to extract:
+
+```python
+from crawl4ai import AsyncWebCrawler, CrawlerRunConfig
+
+async def main():
+    """
+    Extract only specific CSS selectors (e.g., article content only).
+    """
+    crawl_config = CrawlerRunConfig(
+        # Extract only article content
+        css_selector="article.main-content",  # Adjust selector based on target site
+
+        # Or use XPath
+        # xpath="//article[@class='main-content']",
+
+        excluded_tags=['nav', 'aside', 'footer', 'header'],
+        wait_until="networkidle"
+    )
+
+    async with AsyncWebCrawler() as crawler:
+        result = await crawler.arun(
+            url="[TARGET_URL]",
+            config=crawl_config
+        )
+
+        print(result.markdown)
 
 if __name__ == "__main__":
     import asyncio
