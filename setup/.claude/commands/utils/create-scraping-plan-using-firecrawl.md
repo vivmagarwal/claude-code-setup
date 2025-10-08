@@ -132,47 +132,63 @@ Provide:
 """
 )
 
-## Phase 3: Inspect Target Website (If Authentication Required)
+## Phase 3: Inspect Target Website Using Playwright MCP
 
-Use the **web-researcher** agent with Playwright MCP to inspect the target website:
+**YOU (Claude Code) must use Playwright MCP directly to inspect the target website.**
 
-Task(
-  subagent_type="web-researcher",
-  description="Analyze target website structure",
-  prompt="""
-Navigate to the target website at: [TARGET_URL]
+DO NOT delegate this to an agent. Use the Playwright MCP tools yourself to:
 
-If authentication is required, navigate to: [LOGIN_URL]
+### Step 1: Navigate and Screenshot
 
-Identify and document:
+```
+Use mcp__playwright__browser_navigate to visit the target URL
+Use mcp__playwright__browser_take_screenshot to capture the page
+Use mcp__playwright__browser_snapshot to get the page structure
+```
 
-### For Authentication:
-1. Login page structure:
-   - Username/email field selector (CSS selector)
+### Step 2: Identify Key Elements
+
+For **Authentication** (if required):
+1. Navigate to login page: `mcp__playwright__browser_navigate`
+2. Take screenshot: `mcp__playwright__browser_take_screenshot`
+3. Get page snapshot: `mcp__playwright__browser_snapshot`
+4. Identify and test selectors:
+   - Username/email field selector
    - Password field selector
    - Submit button selector
+   - Cookie consent/popup selectors (if present)
+   - Success indicator after login
    - Any CSRF tokens or hidden fields
-   - Success indicator after login (e.g., user menu, dashboard element)
-   - Any cookie consent dialogs or popups to dismiss
-   - Any anti-bot measures (reCAPTCHA, Cloudflare, etc.)
 
-### For Content Extraction:
-1. Page structure analysis:
+For **Content Extraction**:
+1. Navigate to target content page
+2. Take screenshot of the page
+3. Get page snapshot to analyze structure
+4. Identify:
    - Main content container selector
-   - Elements to exclude (nav, footer, ads, etc.)
-   - Dynamic content loading patterns
-   - JavaScript-rendered content
-   - Pagination patterns (if any)
+   - Elements to exclude (nav, header, footer, aside, ads)
+   - Dynamic content patterns
+   - Embedded iframes (if any)
+   - Pagination selectors (if applicable)
 
-Use Playwright MCP to:
-- Take screenshot of key pages
-- Inspect HTML structure
-- Test form field selectors
-- Document exact, working selectors
+### Step 3: Verify Selectors
 
-Provide exact, tested selectors for implementation.
-"""
-)
+Use `mcp__playwright__browser_click` or `mcp__playwright__browser_snapshot` to verify:
+- Selectors are unique and work correctly
+- Forms can be filled
+- Buttons are clickable
+- Success indicators are detectable
+
+### Step 4: Document Findings
+
+After testing with Playwright MCP, document:
+- **Exact CSS selectors** (tested and verified)
+- **Page structure** (main content, elements to exclude)
+- **Authentication flow** (step-by-step with verified selectors)
+- **Screenshots** (save URLs from Playwright)
+- **Any anti-bot measures** (CAPTCHA, Cloudflare, rate limiting)
+
+**CRITICAL**: All selectors in the final plan MUST be real selectors you verified using Playwright MCP, not placeholders.
 
 ## Phase 4: Create Implementation Plan
 
@@ -923,11 +939,20 @@ The implementation plan succeeds if:
 ## Execution Flow
 
 1. **Ask user questions** (Phase 1) - one question at a time, conversational
-2. **Launch parallel research** (Phase 2 & 3) - use both agents simultaneously
-3. **Synthesize findings** - combine research results
-4. **Generate plan** (Phase 4) - create comprehensive markdown file
-5. **Validate** (Phase 5) - check all requirements met
-6. **Present** - show plan location and next steps
+2. **Research documentation** (Phase 2) - use web-researcher agent for Firecrawl v2 docs
+3. **INSPECT TARGET WEBSITE** (Phase 3) - **YOU MUST use Playwright MCP directly**:
+   - Navigate to target URL and login page
+   - Take screenshots
+   - Get page snapshots
+   - Identify and verify all selectors
+   - Test authentication flow
+   - Document exact selectors (no placeholders!)
+4. **Synthesize findings** - combine research + verified selectors
+5. **Generate plan** (Phase 4) - create comprehensive markdown with REAL selectors
+6. **Validate** (Phase 5) - check all requirements met
+7. **Present** - show plan location and next steps
+
+**CRITICAL**: Phase 3 must be done by YOU using Playwright MCP, not delegated to an agent. All selectors in the plan must be verified and real.
 
 ## Critical Success Factors
 
@@ -935,15 +960,17 @@ The implementation plan succeeds if:
 1. Be based on Firecrawl v2 API (not v1)
 2. Include authentication via Actions if required
 3. Choose the right endpoint (scrape vs crawl vs extract vs map)
-4. Provide complete working code examples
-5. Include troubleshooting for common issues
-6. Reference official documentation throughout
+4. **Use REAL selectors verified via Playwright MCP** (not placeholders!)
+5. Provide complete working code examples with actual selectors
+6. Include troubleshooting for common issues
+7. Reference official documentation throughout
 
 **The plan FAILS if:**
 1. Code uses v1 API or deprecated methods
 2. Authentication approach is unclear or incomplete
 3. Wrong endpoint chosen for the use case
-4. Selectors are generic placeholders
-5. No cost estimation provided
+4. **Selectors are generic placeholders like "[USERNAME_SELECTOR]"** - MUST be real!
+5. Selectors were not verified using Playwright MCP in Phase 3
+6. No cost estimation provided
 
 Remember: Firecrawl v2 is powerful and handles many edge cases automatically. Focus on choosing the right endpoint and configuring it correctly for the user's specific needs.

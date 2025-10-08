@@ -124,33 +124,67 @@ Provide:
 """
 )
 
-## Phase 3: Inspect Target Login Page
+## Phase 3: Inspect Target Website Using Playwright MCP
 
-Use the **web-researcher** agent with Playwright MCP to inspect the login page:
+**YOU (Claude Code) must use Playwright MCP directly to inspect the target website.**
 
-Task(
-  subagent_type="web-researcher",
-  description="Analyze target login page structure",
-  prompt="""
-Navigate to the login page at: [LOGIN_URL]
+DO NOT delegate this to an agent. Use the Playwright MCP tools yourself to:
 
-Identify and document:
-1. Username/email field selector (CSS selector or XPath)
-2. Password field selector
-3. Submit button selector
-4. Any CSRF tokens or hidden fields
-5. Success indicator after login (e.g., user menu, dashboard element)
-6. Any anti-bot measures (reCAPTCHA, Cloudflare, etc.)
+### Step 1: Navigate and Screenshot
 
-Use Playwright MCP to:
-- Take screenshot of login page
-- Inspect HTML structure
-- Test form field selectors
-- Document exact selectors needed
+```
+Use mcp__playwright__browser_navigate to visit the target URL
+Use mcp__playwright__browser_take_screenshot to capture the page
+Use mcp__playwright__browser_snapshot to get the page structure
+```
 
-Provide exact, working selectors for implementation.
-"""
-)
+### Step 2: Identify Key Elements
+
+For **Authentication** (if required):
+1. Navigate to login page: `mcp__playwright__browser_navigate`
+2. Take screenshot: `mcp__playwright__browser_take_screenshot`
+3. Get page snapshot: `mcp__playwright__browser_snapshot`
+4. Identify and test selectors:
+   - Username/email field selector (CSS selector or XPath)
+   - Password field selector
+   - Submit button selector
+   - Cookie consent/popup selectors (if present)
+   - Success indicator after login
+   - Any CSRF tokens or hidden fields
+
+For **Content Extraction**:
+1. Navigate to target content page
+2. Take screenshot of the page
+3. Get page snapshot to analyze structure
+4. Identify:
+   - Main content container selector (for css_selector parameter)
+   - Elements to exclude (nav, header, footer, aside, ads) - for excluded_tags
+   - Article or main content wrapper classes/IDs
+   - Dynamic content patterns
+   - Embedded iframes (if any)
+   - Pagination selectors (if applicable)
+
+### Step 3: Verify Selectors
+
+Use `mcp__playwright__browser_click` or `mcp__playwright__browser_snapshot` to verify:
+- Selectors are unique and work correctly
+- Forms can be filled
+- Buttons are clickable
+- Success indicators are detectable
+- Main content selector accurately captures article/content
+
+### Step 4: Document Findings
+
+After testing with Playwright MCP, document:
+- **Exact CSS selectors or XPath** (tested and verified)
+- **Main content selector** (e.g., "article.main-content", ".post-body", etc.)
+- **Elements to exclude** (e.g., ['nav', 'header', 'footer', '.sidebar', '#comments'])
+- **Page structure** (how content is organized)
+- **Authentication flow** (step-by-step with verified selectors)
+- **Screenshots** (save URLs from Playwright)
+- **Any anti-bot measures** (CAPTCHA, Cloudflare, rate limiting)
+
+**CRITICAL**: All selectors in the final plan MUST be real selectors you verified using Playwright MCP, not placeholders like "[USERNAME_SELECTOR]".
 
 ## Phase 3.5: Verify Crawl4AI API (CRITICAL - DO NOT SKIP)
 
@@ -714,26 +748,40 @@ The implementation plan succeeds if:
 ## Execution Flow
 
 1. **Ask user questions** (Phase 1) - one question at a time, conversational
-2. **Launch parallel research** (Phase 2 & 3) - use both agents simultaneously
-3. **VERIFY ACTUAL API** (Phase 3.5) - **DO NOT SKIP** - install and test the library
-4. **Synthesize findings** - combine research + verification results
-5. **Generate plan** (Phase 4) - create comprehensive markdown file with verified API
-6. **Validate** (Phase 5) - check all requirements met, especially API verification
-7. **Present** - show plan location and next steps
+2. **Research documentation** (Phase 2) - use web-researcher agent for Crawl4AI docs
+3. **INSPECT TARGET WEBSITE** (Phase 3) - **YOU MUST use Playwright MCP directly**:
+   - Navigate to target URL and login page
+   - Take screenshots
+   - Get page snapshots
+   - Identify and verify all selectors
+   - Test authentication flow
+   - Identify main content selectors and elements to exclude
+   - Document exact selectors (no placeholders!)
+4. **VERIFY ACTUAL API** (Phase 3.5) - **DO NOT SKIP** - install and test the library
+5. **Synthesize findings** - combine research + verified selectors + API verification
+6. **Generate plan** (Phase 4) - create comprehensive markdown with REAL selectors and verified API
+7. **Validate** (Phase 5) - check all requirements met, especially API verification and real selectors
+8. **Present** - show plan location and next steps
+
+**CRITICAL**: Phase 3 must be done by YOU using Playwright MCP, not delegated to an agent. All selectors in the plan must be verified and real.
 
 ## Critical Success Factors
 
 **The plan MUST:**
 1. Be based on VERIFIED working API (Phase 3.5), not just documentation
-2. Include version-specific notes and warnings
-3. Provide fallback approaches for unstable features
-4. Include a quick verification script user can run
-5. Document exact version tested against
+2. **Use REAL selectors verified via Playwright MCP** (not placeholders!)
+3. Include version-specific notes and warnings
+4. Provide fallback approaches for unstable features
+5. Include a quick verification script user can run
+6. Document exact version tested against
+7. Include actual main content selectors and excluded elements
 
 **The plan FAILS if:**
 1. Code uses deprecated or non-existent methods
 2. Parameter names don't match actual API
 3. Imports fail in fresh environment
-4. No guidance provided for API changes
+4. **Selectors are generic placeholders like "[USERNAME_SELECTOR]"** - MUST be real!
+5. Selectors were not verified using Playwright MCP in Phase 3
+6. No guidance provided for API changes
 
 Remember: Documentation-driven + API-verified approach ensures plan works on first attempt with current Crawl4AI version.
