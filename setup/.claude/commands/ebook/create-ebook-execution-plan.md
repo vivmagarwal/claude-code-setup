@@ -421,6 +421,279 @@ chapters:
 
 ---
 
+## Markdown Structure for PDF Generation (CRITICAL)
+
+### Heading Hierarchy for Page Breaks
+
+**IMPORTANT**: When your ebook will be converted to PDF, headings control page breaks. Plan your structure accordingly:
+
+#### h1 (`#`) - Major Sections (ALWAYS force new page)
+**Use for:**
+- Part dividers ("Part I: Foundation", "Part II: Activity Library")
+- Major section openers that deserve full-page treatment
+- Chapter group introductions
+
+**Formatting impact:**
+- ✅ Always starts on a NEW page
+- ✅ Large, prominent (42px font size)
+- ✅ Creates visual break in PDF
+
+**Example structure:**
+```markdown
+# Part I: Foundation
+
+This part covers the foundational concepts...
+
+# Part II: Activity Library
+
+This part contains all the practical activities...
+```
+
+#### h2 (`##`) - Chapters/Activities (FORCE new page, look like chapter titles)
+**Use for:**
+- Individual chapters that should start fresh page
+- Major activities or exercises
+- Significant topic changes that deserve visual separation
+- Any content that should be treated as a "chapter-level" entity
+
+**Formatting impact:**
+- ✅ Forces NEW page (page break before)
+- ✅ Large, bold font (38px, weight 800) - stands out prominently
+- ✅ Looks and feels like a chapter title
+- ✅ Creates strong visual hierarchy
+
+**Example structure:**
+```markdown
+## Chapter 1: Why Nano Activities Transform Learning
+
+Introduction to the chapter...
+
+## Lightning Round
+
+A quick-fire questioning technique...
+
+## Rapid Fire
+
+Similar to Lightning Round but faster...
+```
+
+**Why h2 gets page breaks:**
+- Each chapter/activity deserves dedicated space
+- Helps readers find content easily when flipping through PDF
+- Creates professional, book-like appearance
+- Prevents cramming multiple major topics on same page
+
+#### h3 (`###`) - Subsections (NO page break)
+**Use for:**
+- Subsections within chapters
+- Topic groups within activities
+- Breaking down complex concepts
+- Organizing content within a page
+
+**Formatting impact:**
+- ❌ No page break
+- ✅ Medium size (26px)
+- ✅ Still prominent but contained within chapter
+
+**Example:**
+```markdown
+## Lightning Round
+
+### At a Glance
+
+Quick overview of the activity...
+
+### How It Works
+
+Step-by-step instructions...
+
+### Why It Works
+
+The science behind it...
+```
+
+#### h4 (`####`) - Minor subsections (NO page break)
+**Use for:**
+- Minor details within subsections
+- Optional content
+- Variations or alternatives
+- Technical notes
+
+**Formatting impact:**
+- ❌ No page break
+- ✅ Smaller (22px)
+- ✅ Subtle hierarchy
+
+### Strategic Structure Planning
+
+**When structuring your ebook content, ask:**
+
+1. **Should this start a new page?**
+   - Yes, major section? → Use `#` (h1)
+   - Yes, chapter/activity? → Use `##` (h2)
+   - No, subsection only? → Use `###` (h3) or `####` (h4)
+
+2. **Is this "chapter-level" content?**
+   - If yes → Use `##` (h2) even if it's short
+   - If no → Use lower heading level
+
+3. **Will readers want to find this quickly?**
+   - If yes → Give it prominent heading (`##`) with page break
+   - If no → Nest under parent topic
+
+### Example: Well-Structured Ebook
+
+```markdown
+# Part I: Foundation
+
+Introduction to this part...
+
+## Chapter 1: Why Nano Activities Transform Learning
+
+Opening content for chapter 1...
+
+### The Attention Crisis
+
+Discussion of the problem...
+
+### What Makes "Nano" Different
+
+Explanation...
+
+### The Compound Effect
+
+How small changes accumulate...
+
+## Chapter 2: The Science Behind Short Engagement
+
+Opening content for chapter 2...
+
+### Cognitive Science Foundations
+
+Scientific background...
+
+# Part II: The Activity Library
+
+Introduction to activity collection...
+
+## Lightning Round
+
+**At a Glance**: Quick overview
+
+**How It Works**: Instructions...
+
+**Variations**: Different approaches...
+
+## Body Letters
+
+Similar structure...
+
+## Pink Toe
+
+Another activity...
+```
+
+**Result in PDF:**
+- Part I: New page, large heading
+- Chapter 1: New page, prominent chapter title
+- "The Attention Crisis": Same page as Chapter 1, subsection
+- Chapter 2: New page, new chapter
+- Part II: New page, large section heading
+- Lightning Round: New page, treated as chapter
+- Body Letters: New page, each activity gets space
+- Pink Toe: New page, consistent treatment
+
+### Common Mistakes to Avoid
+
+❌ **Using h1 for everything**: Creates too many page breaks, wastes space
+```markdown
+# Lightning Round    ← TOO BIG for individual activity
+# Body Letters       ← Every activity breaks page unnecessarily
+```
+
+❌ **Using h3 for chapters**: No page break, chapters run together
+```markdown
+### Chapter 1: Introduction    ← Won't start new page!
+### Chapter 2: Getting Started ← Runs into Chapter 1!
+```
+
+✅ **Correct hierarchy**:
+```markdown
+# Part I: Foundation             ← Major section, new page
+
+## Chapter 1: Introduction       ← Chapter, new page, prominent
+
+### Core Concepts                ← Subsection, same page
+
+## Chapter 2: Getting Started    ← New chapter, new page
+
+### First Steps                  ← Subsection, same page
+```
+
+### YAML Metadata Handling (CRITICAL)
+
+**Problem**: YAML frontmatter blocks (surrounded by `---`) interfere with page breaks.
+
+**❌ BAD - YAML before heading:**
+```markdown
+---
+title: "Rapid Fire"
+duration: "60-90 seconds"
+tags: ["quick", "energizer"]
+---
+
+## Rapid Fire
+
+Content here...
+```
+
+**Why it's bad:**
+- YAML content appears before the heading
+- Prevents clean page break at heading
+- Creates messy spacing
+
+**✅ GOOD - No YAML in final ebook:**
+```markdown
+## Rapid Fire
+
+Content here...
+```
+
+**Solution**: The compilation script (`compile_ebook.py`) automatically removes:
+1. YAML frontmatter blocks (`---...---`)
+2. YAML metadata lines (e.g., "⏰ Duration:", "👥 Group:")
+3. Emojis for professional appearance
+
+**What this means for you:**
+- Write YAML in source files for organization (it helps during writing)
+- Don't worry about it in final ebook (it gets stripped)
+- Focus on clean markdown structure for the reader
+
+### "Related Activities" Links
+
+**Problem**: File references don't work in PDFs.
+
+**❌ BAD:**
+```markdown
+**Related Activities:** [Rapid Fire](015-rapid-fire.md), [Speed Sort](../07-critical-thinking/014-speed-sort.md)
+```
+
+**✅ GOOD:**
+```markdown
+**Related Activities:** [Rapid Fire](#rapid-fire), [Speed Sort](#speed-sort)
+```
+
+**Solution**: The compilation script automatically converts:
+- File paths (`.md`, `../`, `../../`) → Anchor links (`#activity-name`)
+- Removes leading numbers: `015-rapid-fire.md` → `#rapid-fire`
+
+**How anchor IDs work:**
+- `## Lightning Round` → `#lightning-round` (lowercase, hyphens)
+- `## Chapter 1: Why Activities Work` → `#chapter-1-why-activities-work`
+- `## Appendix A: Resources` → `#appendix-a-resources`
+
+---
+
 ## Image Generation Workflow
 
 ### Step-by-Step Process
@@ -605,6 +878,24 @@ cat front-matter/*.md chapters/*.md back-matter/*.md > final/complete-ebook.md
 - Brand guidelines: ${2:-.project-management/ebook/brand-guidelines.md}
 - Color palette: [Colors]
 - Typography: [Fonts/styles]
+
+---
+
+## Next Step: PDF Generation
+
+Once all chapters are completed and the final ebook markdown is assembled:
+
+**Convert to professional PDF** using the `/ebook:create-md-to-pdf-plan` command:
+```bash
+/ebook:create-md-to-pdf-plan <repository-path> [cover-image-path]
+```
+
+This will generate a publication-ready PDF with:
+- Medium.com-inspired typography for optimal readability
+- Professional monochrome color scheme
+- Proper image handling and figcaption removal
+- Interactive table of contents
+- Optimized for digital distribution
 
 ---
 
