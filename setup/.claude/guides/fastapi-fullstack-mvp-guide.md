@@ -835,24 +835,24 @@ APIs used:
 Perfect for students and learning!
 ```
 
-### Testing with Playwright MCP
+### Testing with chrome-devtools MCP
 
-Add comprehensive testing using Playwright MCP server:
+Add comprehensive testing using chrome-devtools MCP server:
 
 ```python
-# Test with Playwright MCP
+# Test with chrome-devtools MCP
 # 1. Navigate to app
-await mcp__playwright__browser_navigate(url="http://localhost:8000")
+await mcp__chrome-devtools__browser_navigate(url="http://localhost:8000")
 
 # 2. Fill form
-await mcp__playwright__browser_type(
+await mcp__chrome-devtools__browser_type(
     element="search input",
     ref="e18",
     text="test query"
 )
 
 # 3. Click button
-await mcp__playwright__browser_click(
+await mcp__chrome-devtools__browser_click(
     element="search button",
     ref="e19"
 )

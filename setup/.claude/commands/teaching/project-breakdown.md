@@ -66,7 +66,7 @@ These agents operate with independent context windows for optimal performance.
     - For fullstack: Test backend API endpoints first using curl/httpie
     - Verify all backend functionality independently
     - Only then test frontend integration
-    - Use Playwright MCP for frontend testing
+    - Use chrome-devtools MCP for frontend testing
     - Document setup quirks
   </phase_3_verification>
 
@@ -79,7 +79,7 @@ These agents operate with independent context windows for optimal performance.
     BACKEND-FIRST TESTING:
     - Create API test suite for backend steps
     - Use curl/httpie/pytest for API testing
-    - Playwright MCP only for frontend steps
+    - chrome-devtools MCP only for frontend steps
     - Verify functionality at each layer
   </phase_5_testing>
 
@@ -353,7 +353,7 @@ curl http://localhost:8000/api/external/weather?city=London
 
 ## Frontend Testing Framework (Steps 6-10)
 
-### Playwright MCP Testing Protocol
+### chrome-devtools MCP Testing Protocol
 
 ```javascript
 // Only used for frontend steps (6-10)
@@ -449,7 +449,7 @@ After EVERY step completion:
 │   └── [steps 2-10...]/
 ├── testing-framework/
 │   ├── backend-tests/        # API test scripts
-│   └── frontend-tests/       # Playwright test scripts
+│   └── frontend-tests/       # chrome-devtools test scripts
 └── progress-reports/
     └── [timestamp]-status.yaml
 ```
@@ -459,7 +459,7 @@ After EVERY step completion:
 Before marking ANY step complete:
 ☐ Previous step's end-code works perfectly
 ☐ For backend: All API endpoints tested with curl/httpie
-☐ For frontend: UI tested with Playwright MCP
+☐ For frontend: UI tested with chrome-devtools MCP
 ☐ FILES_CHANGED.yaml updated with all modifications
 ☐ Implementation notes document critical context
 ☐ YAML status reflects current state
@@ -492,7 +492,7 @@ Before marking ANY step complete:
 ☐ FILES_CHANGED.yaml tracking all modifications
 ☐ Context clearing protocol documented
 ☐ API test commands provided for backend steps
-☐ Playwright tests provided for frontend steps
+☐ chrome-devtools tests provided for frontend steps
 ☐ YAML tracking structure in place
 ☐ Living documentation approach implemented
 ☐ Junior developer can execute independently

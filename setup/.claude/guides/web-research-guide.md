@@ -7,7 +7,7 @@
 2. WebSearch         � Current events, general queries, finding resources
 3. WebFetch          � Specific URLs, articles, GitHub pages
 4. GitHub CLI        � Repository data, issues, PRs, releases
-5. Playwright MCP    � JavaScript-heavy sites, interactive content
+5. chrome-devtools MCP    � JavaScript-heavy sites, interactive content
 ```
 
 ## 1. Context7 MCP Server (Priority for Documentation)
@@ -151,7 +151,7 @@ WebFetch(
 )
 ```
 
-## 5. Playwright MCP (Dynamic Content)
+## 5. chrome-devtools MCP (Dynamic Content)
 
 ### When to Use
 - JavaScript-rendered content
@@ -163,27 +163,27 @@ WebFetch(
 ### Basic Workflow
 ```python
 # 1. Navigate to page
-mcp__playwright__browser_navigate(
+mcp__chrome-devtools__browser_navigate(
     url="https://example.com/docs"
 )
 
 # 2. Take snapshot (better than screenshot)
-mcp__playwright__browser_snapshot()
+mcp__chrome-devtools__browser_snapshot()
 
 # 3. Interact if needed
-mcp__playwright__browser_click(
+mcp__chrome-devtools__browser_click(
     element="API Reference button",
     ref="button[aria-label='API']"
 )
 
 # 4. Extract content
-mcp__playwright__browser_snapshot()
+mcp__chrome-devtools__browser_snapshot()
 ```
 
 ### Advanced Patterns
 ```python
 # Search within dynamic site
-mcp__playwright__browser_type(
+mcp__chrome-devtools__browser_type(
     element="Search input",
     ref="input#search",
     text="authentication",
@@ -191,7 +191,7 @@ mcp__playwright__browser_type(
 )
 
 # Wait for content
-mcp__playwright__browser_wait_for(
+mcp__chrome-devtools__browser_wait_for(
     text="Results loaded"
 )
 ```
@@ -274,7 +274,7 @@ WebSearch(
 Documentation � Context7 > WebFetch > WebSearch
 Code Examples � GitHub > Context7 > WebSearch
 Current Events � WebSearch > WebFetch
-Dynamic Sites � Playwright > WebFetch
+Dynamic Sites � chrome-devtools > WebFetch
 ```
 
 ### 2. Efficient Research
@@ -316,9 +316,9 @@ resolve-library-id("nextjs")  # Try: "next.js", "next", "vercel next"
 
 ### Issue: WebFetch timeout
 ```python
-# Solution: Use Playwright for heavy sites
-mcp__playwright__browser_navigate(url="...")
-mcp__playwright__browser_snapshot()
+# Solution: Use chrome-devtools for heavy sites
+mcp__chrome-devtools__browser_navigate(url="...")
+mcp__chrome-devtools__browser_snapshot()
 ```
 
 ### Issue: GitHub rate limits

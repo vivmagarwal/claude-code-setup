@@ -132,26 +132,26 @@ Provide:
 """
 )
 
-## Phase 3: Inspect Target Website Using Playwright MCP
+## Phase 3: Inspect Target Website Using chrome-devtools MCP
 
-**YOU (Claude Code) must use Playwright MCP directly to inspect the target website.**
+**YOU (Claude Code) must use chrome-devtools MCP directly to inspect the target website.**
 
-DO NOT delegate this to an agent. Use the Playwright MCP tools yourself to:
+DO NOT delegate this to an agent. Use the chrome-devtools MCP tools yourself to:
 
 ### Step 1: Navigate and Screenshot
 
 ```
-Use mcp__playwright__browser_navigate to visit the target URL
-Use mcp__playwright__browser_take_screenshot to capture the page
-Use mcp__playwright__browser_snapshot to get the page structure
+Use mcp__chrome-devtools__browser_navigate to visit the target URL
+Use mcp__chrome-devtools__browser_take_screenshot to capture the page
+Use mcp__chrome-devtools__browser_snapshot to get the page structure
 ```
 
 ### Step 2: Identify Key Elements
 
 For **Authentication** (if required):
-1. Navigate to login page: `mcp__playwright__browser_navigate`
-2. Take screenshot: `mcp__playwright__browser_take_screenshot`
-3. Get page snapshot: `mcp__playwright__browser_snapshot`
+1. Navigate to login page: `mcp__chrome-devtools__browser_navigate`
+2. Take screenshot: `mcp__chrome-devtools__browser_take_screenshot`
+3. Get page snapshot: `mcp__chrome-devtools__browser_snapshot`
 4. Identify and test selectors:
    - Username/email field selector
    - Password field selector
@@ -173,7 +173,7 @@ For **Content Extraction**:
 
 ### Step 3: Verify Selectors
 
-Use `mcp__playwright__browser_click` or `mcp__playwright__browser_snapshot` to verify:
+Use `mcp__chrome-devtools__browser_click` or `mcp__chrome-devtools__browser_snapshot` to verify:
 - Selectors are unique and work correctly
 - Forms can be filled
 - Buttons are clickable
@@ -181,14 +181,14 @@ Use `mcp__playwright__browser_click` or `mcp__playwright__browser_snapshot` to v
 
 ### Step 4: Document Findings
 
-After testing with Playwright MCP, document:
+After testing with chrome-devtools MCP, document:
 - **Exact CSS selectors** (tested and verified)
 - **Page structure** (main content, elements to exclude)
 - **Authentication flow** (step-by-step with verified selectors)
-- **Screenshots** (save URLs from Playwright)
+- **Screenshots** (save URLs from chrome-devtools)
 - **Any anti-bot measures** (CAPTCHA, Cloudflare, rate limiting)
 
-**CRITICAL**: All selectors in the final plan MUST be real selectors you verified using Playwright MCP, not placeholders.
+**CRITICAL**: All selectors in the final plan MUST be real selectors you verified using chrome-devtools MCP, not placeholders.
 
 ## Phase 4: Create Implementation Plan
 
@@ -754,7 +754,7 @@ output/
 **Common Issues and Solutions:**
 
 - **Authentication fails**:
-  - Verify selectors are correct using Playwright inspector
+  - Verify selectors are correct using chrome-devtools inspector
   - Check for CAPTCHA or rate limiting on login page
   - Ensure wait times are sufficient for page loads
   - Try increasing `waitFor` in actions
@@ -940,7 +940,7 @@ The implementation plan succeeds if:
 
 1. **Ask user questions** (Phase 1) - one question at a time, conversational
 2. **Research documentation** (Phase 2) - use web-researcher agent for Firecrawl v2 docs
-3. **INSPECT TARGET WEBSITE** (Phase 3) - **YOU MUST use Playwright MCP directly**:
+3. **INSPECT TARGET WEBSITE** (Phase 3) - **YOU MUST use chrome-devtools MCP directly**:
    - Navigate to target URL and login page
    - Take screenshots
    - Get page snapshots
@@ -952,7 +952,7 @@ The implementation plan succeeds if:
 6. **Validate** (Phase 5) - check all requirements met
 7. **Present** - show plan location and next steps
 
-**CRITICAL**: Phase 3 must be done by YOU using Playwright MCP, not delegated to an agent. All selectors in the plan must be verified and real.
+**CRITICAL**: Phase 3 must be done by YOU using chrome-devtools MCP, not delegated to an agent. All selectors in the plan must be verified and real.
 
 ## Critical Success Factors
 
@@ -960,7 +960,7 @@ The implementation plan succeeds if:
 1. Be based on Firecrawl v2 API (not v1)
 2. Include authentication via Actions if required
 3. Choose the right endpoint (scrape vs crawl vs extract vs map)
-4. **Use REAL selectors verified via Playwright MCP** (not placeholders!)
+4. **Use REAL selectors verified via chrome-devtools MCP** (not placeholders!)
 5. Provide complete working code examples with actual selectors
 6. Include troubleshooting for common issues
 7. Reference official documentation throughout
@@ -970,7 +970,7 @@ The implementation plan succeeds if:
 2. Authentication approach is unclear or incomplete
 3. Wrong endpoint chosen for the use case
 4. **Selectors are generic placeholders like "[USERNAME_SELECTOR]"** - MUST be real!
-5. Selectors were not verified using Playwright MCP in Phase 3
+5. Selectors were not verified using chrome-devtools MCP in Phase 3
 6. No cost estimation provided
 
 Remember: Firecrawl v2 is powerful and handles many edge cases automatically. Focus on choosing the right endpoint and configuring it correctly for the user's specific needs.

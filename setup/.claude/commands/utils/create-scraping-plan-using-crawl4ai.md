@@ -124,26 +124,26 @@ Provide:
 """
 )
 
-## Phase 3: Inspect Target Website Using Playwright MCP
+## Phase 3: Inspect Target Website Using chrome-devtools MCP
 
-**YOU (Claude Code) must use Playwright MCP directly to inspect the target website.**
+**YOU (Claude Code) must use chrome-devtools MCP directly to inspect the target website.**
 
-DO NOT delegate this to an agent. Use the Playwright MCP tools yourself to:
+DO NOT delegate this to an agent. Use the chrome-devtools MCP tools yourself to:
 
 ### Step 1: Navigate and Screenshot
 
 ```
-Use mcp__playwright__browser_navigate to visit the target URL
-Use mcp__playwright__browser_take_screenshot to capture the page
-Use mcp__playwright__browser_snapshot to get the page structure
+Use mcp__chrome-devtools__browser_navigate to visit the target URL
+Use mcp__chrome-devtools__browser_take_screenshot to capture the page
+Use mcp__chrome-devtools__browser_snapshot to get the page structure
 ```
 
 ### Step 2: Identify Key Elements
 
 For **Authentication** (if required):
-1. Navigate to login page: `mcp__playwright__browser_navigate`
-2. Take screenshot: `mcp__playwright__browser_take_screenshot`
-3. Get page snapshot: `mcp__playwright__browser_snapshot`
+1. Navigate to login page: `mcp__chrome-devtools__browser_navigate`
+2. Take screenshot: `mcp__chrome-devtools__browser_take_screenshot`
+3. Get page snapshot: `mcp__chrome-devtools__browser_snapshot`
 4. Identify and test selectors:
    - Username/email field selector (CSS selector or XPath)
    - Password field selector
@@ -166,7 +166,7 @@ For **Content Extraction**:
 
 ### Step 3: Verify Selectors
 
-Use `mcp__playwright__browser_click` or `mcp__playwright__browser_snapshot` to verify:
+Use `mcp__chrome-devtools__browser_click` or `mcp__chrome-devtools__browser_snapshot` to verify:
 - Selectors are unique and work correctly
 - Forms can be filled
 - Buttons are clickable
@@ -175,16 +175,16 @@ Use `mcp__playwright__browser_click` or `mcp__playwright__browser_snapshot` to v
 
 ### Step 4: Document Findings
 
-After testing with Playwright MCP, document:
+After testing with chrome-devtools MCP, document:
 - **Exact CSS selectors or XPath** (tested and verified)
 - **Main content selector** (e.g., "article.main-content", ".post-body", etc.)
 - **Elements to exclude** (e.g., ['nav', 'header', 'footer', '.sidebar', '#comments'])
 - **Page structure** (how content is organized)
 - **Authentication flow** (step-by-step with verified selectors)
-- **Screenshots** (save URLs from Playwright)
+- **Screenshots** (save URLs from chrome-devtools)
 - **Any anti-bot measures** (CAPTCHA, Cloudflare, rate limiting)
 
-**CRITICAL**: All selectors in the final plan MUST be real selectors you verified using Playwright MCP, not placeholders like "[USERNAME_SELECTOR]".
+**CRITICAL**: All selectors in the final plan MUST be real selectors you verified using chrome-devtools MCP, not placeholders like "[USERNAME_SELECTOR]".
 
 ## Phase 3.5: Verify Crawl4AI API (CRITICAL - DO NOT SKIP)
 
@@ -290,7 +290,7 @@ Based on research results, generate a comprehensive markdown file named `{target
 ```python
 # Imports verified to work with Crawl4AI v[X.X.X]
 from crawl4ai import AsyncWebCrawler, BrowserConfig, CrawlerRunConfig
-from playwright.async_api import async_playwright
+from chrome-devtools.async_api import async_chrome-devtools
 import json
 import os
 ```
@@ -305,13 +305,13 @@ STORAGE_STATE_FILE = "auth_state.json"
 
 async def perform_login():
     """
-    Authenticate with target website using Playwright.
+    Authenticate with target website using chrome-devtools.
     Saves authentication state for reuse by Crawl4AI.
 
     Based on: [link to docs section]
     Verified with: Crawl4AI v[X.X.X]
     """
-    async with async_playwright() as p:
+    async with async_chrome-devtools() as p:
         browser = await p.chromium.launch(headless=False)
         context = await browser.new_context()
         page = await context.new_page()
@@ -550,7 +550,7 @@ output/
 **Common Issues and Solutions:**
 
 - **Authentication fails**:
-  - Verify selectors with Playwright inspector
+  - Verify selectors with chrome-devtools inspector
   - Check for CAPTCHA or rate limiting
   - Confirm success indicator selector is correct
   - Try running with `headless=False` to see what's happening
@@ -749,7 +749,7 @@ The implementation plan succeeds if:
 
 1. **Ask user questions** (Phase 1) - one question at a time, conversational
 2. **Research documentation** (Phase 2) - use web-researcher agent for Crawl4AI docs
-3. **INSPECT TARGET WEBSITE** (Phase 3) - **YOU MUST use Playwright MCP directly**:
+3. **INSPECT TARGET WEBSITE** (Phase 3) - **YOU MUST use chrome-devtools MCP directly**:
    - Navigate to target URL and login page
    - Take screenshots
    - Get page snapshots
@@ -763,13 +763,13 @@ The implementation plan succeeds if:
 7. **Validate** (Phase 5) - check all requirements met, especially API verification and real selectors
 8. **Present** - show plan location and next steps
 
-**CRITICAL**: Phase 3 must be done by YOU using Playwright MCP, not delegated to an agent. All selectors in the plan must be verified and real.
+**CRITICAL**: Phase 3 must be done by YOU using chrome-devtools MCP, not delegated to an agent. All selectors in the plan must be verified and real.
 
 ## Critical Success Factors
 
 **The plan MUST:**
 1. Be based on VERIFIED working API (Phase 3.5), not just documentation
-2. **Use REAL selectors verified via Playwright MCP** (not placeholders!)
+2. **Use REAL selectors verified via chrome-devtools MCP** (not placeholders!)
 3. Include version-specific notes and warnings
 4. Provide fallback approaches for unstable features
 5. Include a quick verification script user can run
@@ -781,7 +781,7 @@ The implementation plan succeeds if:
 2. Parameter names don't match actual API
 3. Imports fail in fresh environment
 4. **Selectors are generic placeholders like "[USERNAME_SELECTOR]"** - MUST be real!
-5. Selectors were not verified using Playwright MCP in Phase 3
+5. Selectors were not verified using chrome-devtools MCP in Phase 3
 6. No guidance provided for API changes
 
 Remember: Documentation-driven + API-verified approach ensures plan works on first attempt with current Crawl4AI version.

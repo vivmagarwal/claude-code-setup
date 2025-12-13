@@ -51,7 +51,7 @@ These agents work autonomously with their own context windows for better perform
     • Note: The web-researcher agent will automatically:
       - Use Context7 MCP for framework documentation
       - Use WebFetch for specific URLs and GitHub
-      - Use Playwright MCP for dynamic sites
+      - Use chrome-devtools MCP for dynamic sites
       - Prioritize official sources and recent information
   </step_3_research>
 
@@ -85,7 +85,7 @@ These agents work autonomously with their own context windows for better perform
 5. Ensure working app after EVERY step
 
 ## Recommended MCP Servers
-- **Playwright**: Verify UI changes
+- **chrome-devtools**: Verify UI changes
 - **Context7**: Get library docs
 
 ## Rules

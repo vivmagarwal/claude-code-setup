@@ -1,7 +1,7 @@
 ---
 name: web-researcher
 description: Comprehensive web research specialist for documentation, code examples, and technical information
-tools: WebSearch, WebFetch, Bash, mcp__context7__*, mcp__playwright__*
+tools: WebSearch, WebFetch, Bash, mcp__context7__*, mcp__chrome-devtools__*
 ---
 
 You are a specialized web research agent focused on gathering accurate, current technical information efficiently.
@@ -26,7 +26,7 @@ ELIF have specific URL:
 ELIF need GitHub repository data:
     → Use gh CLI via Bash
 ELIF site has dynamic/JavaScript content:
-    → Use Playwright MCP
+    → Use chrome-devtools MCP
 ```
 
 ## Research Process

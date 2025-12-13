@@ -6,7 +6,7 @@ FEATURES:
   ✓ Title-based filenames (not cryptic video IDs)
   ✓ Playlist support (download entire playlists)
   ✓ Multi-language support (hindi, spanish, etc)
-  ✓ Playwright fallback (bypasses API blocks)
+  ✓ chrome-devtools fallback (bypasses API blocks)
   ✓ User-agent rotation (appear as different browsers)
   ✓ Auto-resume (skip existing files)
   ✓ Rate limit handling with exponential backoff
@@ -24,7 +24,7 @@ QUICK START:
   # Different language
   python youtube_transcript.py "VIDEO_URL" -o output.md --language=hi
 
-PLAYWRIGHT FALLBACK:
+chrome-devtools FALLBACK:
   When YouTube API fails (rate limits, IP blocks), the script automatically:
   1. Launches a real browser
   2. Opens the video page
@@ -32,11 +32,11 @@ PLAYWRIGHT FALLBACK:
   4. Extracts transcript from page
 
   Works even when completely IP-blocked! Enabled by default.
-  Disable with: --use-playwright-fallback false
+  Disable with: --use-chrome-devtools-fallback false
 
 DEPENDENCIES:
-  pip install youtube-transcript-api yt-dlp pytube playwright
-  playwright install chromium
+  pip install youtube-transcript-api yt-dlp pytube chrome-devtools
+  chrome-devtools install chromium
 
 RATE LIMITING TIPS:
   <10 videos:   --delay 1.0
@@ -48,7 +48,7 @@ PROGRAMMATIC USE:
   from youtube_transcript import fetch_transcript, save_transcript
 
   markdown = fetch_transcript("VIDEO_URL", include_timestamps=True)
-  save_transcript("VIDEO_URL", "output.md", use_playwright_fallback=True)
+  save_transcript("VIDEO_URL", "output.md", use_chrome-devtools_fallback=True)
 """
 
 import re
@@ -81,10 +81,10 @@ except ImportError:
     PYTUBE_AVAILABLE = False
 
 try:
-    from playwright.sync_api import sync_playwright
-    PLAYWRIGHT_AVAILABLE = True
+    from chrome-devtools.sync_api import sync_chrome-devtools
+    chrome-devtools_AVAILABLE = True
 except ImportError:
-    PLAYWRIGHT_AVAILABLE = False
+    chrome-devtools_AVAILABLE = False
 
 # User agent pool for rotation (appear as different browsers/devices)
 USER_AGENTS = [
@@ -347,13 +347,13 @@ def fetch_transcript(
         raise Exception(f"Failed to fetch transcript: {str(e)}")
 
 
-def fetch_transcript_playwright(
+def fetch_transcript_chrome-devtools(
     url: str,
     include_timestamps: bool = False,
     headless: bool = True
 ) -> str:
     """
-    Fallback method: Fetch transcript using Playwright browser automation.
+    Fallback method: Fetch transcript using chrome-devtools browser automation.
     This bypasses API restrictions by actually opening the video page.
 
     Args:
@@ -364,18 +364,18 @@ def fetch_transcript_playwright(
     Returns:
         Formatted markdown string
     """
-    if not PLAYWRIGHT_AVAILABLE:
-        raise ImportError("Playwright is required for fallback. Install with: pip install playwright && playwright install chromium")
+    if not chrome-devtools_AVAILABLE:
+        raise ImportError("chrome-devtools is required for fallback. Install with: pip install chrome-devtools && chrome-devtools install chromium")
 
     video_id = extract_video_id(url)
     if not video_id:
         raise ValueError(f"Invalid YouTube URL: {url}")
 
     video_url = f"https://www.youtube.com/watch?v={video_id}"
-    logger.info(f"Using Playwright fallback for: {video_url}")
+    logger.info(f"Using chrome-devtools fallback for: {video_url}")
 
     try:
-        with sync_playwright() as p:
+        with sync_chrome-devtools() as p:
             # Launch browser with random user agent
             browser = p.chromium.launch(headless=headless)
             context = browser.new_context(
@@ -464,7 +464,7 @@ def fetch_transcript_playwright(
             markdown_lines.append("# YouTube Transcript\n")
             markdown_lines.append(f"**Video ID:** {video_id}")
             markdown_lines.append(f"**URL:** {video_url}")
-            markdown_lines.append("**Source:** Playwright Fallback\n")
+            markdown_lines.append("**Source:** chrome-devtools Fallback\n")
             markdown_lines.append("---\n")
 
             if include_timestamps:
@@ -489,7 +489,7 @@ def fetch_transcript_playwright(
             return '\n'.join(markdown_lines)
 
     except Exception as e:
-        raise Exception(f"Playwright fallback failed: {str(e)}")
+        raise Exception(f"chrome-devtools fallback failed: {str(e)}")
 
 
 def save_transcript(
@@ -497,17 +497,17 @@ def save_transcript(
     output_file: str,
     include_timestamps: bool = False,
     language: str = 'en',
-    use_playwright_fallback: bool = True
+    use_chrome-devtools_fallback: bool = True
 ) -> str:
     """
-    Fetch transcript and save to file with automatic Playwright fallback.
+    Fetch transcript and save to file with automatic chrome-devtools fallback.
 
     Args:
         url: YouTube video URL
         output_file: Path to output markdown file
         include_timestamps: Include timestamps in output
         language: Preferred language code
-        use_playwright_fallback: Use Playwright as fallback when API fails (default: True)
+        use_chrome-devtools_fallback: Use chrome-devtools as fallback when API fails (default: True)
 
     Returns:
         Path to saved file
@@ -522,14 +522,14 @@ def save_transcript(
         api_error = str(e)
         logger.warning(f"  API failed: {api_error[:100]}")
 
-        # Try Playwright fallback if enabled
-        if use_playwright_fallback and PLAYWRIGHT_AVAILABLE:
+        # Try chrome-devtools fallback if enabled
+        if use_chrome-devtools_fallback and chrome-devtools_AVAILABLE:
             try:
-                logger.info("  Attempting Playwright fallback...")
-                markdown = fetch_transcript_playwright(url, include_timestamps)
+                logger.info("  Attempting chrome-devtools fallback...")
+                markdown = fetch_transcript_chrome-devtools(url, include_timestamps)
             except Exception as fallback_error:
-                logger.error(f"  Playwright fallback also failed: {str(fallback_error)[:100]}")
-                raise Exception(f"Both API and Playwright failed. API: {api_error[:50]}, Playwright: {str(fallback_error)[:50]}")
+                logger.error(f"  chrome-devtools fallback also failed: {str(fallback_error)[:100]}")
+                raise Exception(f"Both API and chrome-devtools failed. API: {api_error[:50]}, chrome-devtools: {str(fallback_error)[:50]}")
         else:
             # Re-raise original error if fallback not available/enabled
             raise Exception(api_error)
@@ -549,7 +549,7 @@ def batch_fetch(
     delay: float = 1.0,
     max_retries: int = 3,
     skip_existing: bool = True,
-    use_playwright_fallback: bool = True
+    use_chrome-devtools_fallback: bool = True
 ) -> Dict[str, str]:
     """
     Fetch multiple transcripts with rate limiting and retry logic.
@@ -562,7 +562,7 @@ def batch_fetch(
         delay: Delay between requests in seconds (default: 1.0)
         max_retries: Maximum number of retries per video (default: 3)
         skip_existing: Skip videos that already have transcript files (default: True)
-        use_playwright_fallback: Use Playwright as fallback when API fails (default: True)
+        use_chrome-devtools_fallback: Use chrome-devtools as fallback when API fails (default: True)
 
     Returns:
         Dictionary mapping URLs to output file paths
@@ -602,7 +602,7 @@ def batch_fetch(
         # Retry logic with exponential backoff
         for attempt in range(max_retries):
             try:
-                save_transcript(url, output_file, include_timestamps, language, use_playwright_fallback)
+                save_transcript(url, output_file, include_timestamps, language, use_chrome-devtools_fallback)
                 results[url] = output_file
                 print(f"✓ [{idx}/{total}] Saved: {filename}.md")
 
@@ -641,7 +641,7 @@ def fetch_playlist_transcripts(
     language: str = 'en',
     delay: float = 2.0,
     max_retries: int = 3,
-    use_playwright_fallback: bool = True
+    use_chrome-devtools_fallback: bool = True
 ) -> Dict[str, str]:
     """
     Fetch transcripts for all videos in a playlist.
@@ -653,7 +653,7 @@ def fetch_playlist_transcripts(
         language: Preferred language code
         delay: Delay between requests in seconds
         max_retries: Maximum number of retries per video
-        use_playwright_fallback: Use Playwright as fallback when API fails (default: True)
+        use_chrome-devtools_fallback: Use chrome-devtools as fallback when API fails (default: True)
 
     Returns:
         Dictionary mapping video URLs to output file paths
@@ -664,13 +664,13 @@ def fetch_playlist_transcripts(
     video_urls = fetch_playlist_videos(playlist_url)
     print(f"Found {len(video_urls)} videos in playlist")
     print(f"Using {delay}s delay between requests and max {max_retries} retries per video")
-    print(f"Playwright fallback: {'Enabled' if use_playwright_fallback else 'Disabled'}\n")
+    print(f"chrome-devtools fallback: {'Enabled' if use_chrome-devtools_fallback else 'Disabled'}\n")
 
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
 
     # Download all transcripts
-    return batch_fetch(video_urls, output_dir, include_timestamps, language, delay, max_retries, True, use_playwright_fallback)
+    return batch_fetch(video_urls, output_dir, include_timestamps, language, delay, max_retries, True, use_chrome-devtools_fallback)
 
 
 def main():
@@ -714,16 +714,16 @@ def main():
         help='Maximum number of retries per video on errors (default: 3)'
     )
     parser.add_argument(
-        '--use-playwright-fallback',
+        '--use-chrome-devtools-fallback',
         type=lambda x: x.lower() in ['true', '1', 'yes'],
         default=True,
-        help='Use Playwright browser automation as fallback when API fails (default: True)'
+        help='Use chrome-devtools browser automation as fallback when API fails (default: True)'
     )
     parser.add_argument(
         '--headless',
         action='store_true',
         default=True,
-        help='Run Playwright in headless mode (default: True)'
+        help='Run chrome-devtools in headless mode (default: True)'
     )
 
     args = parser.parse_args()
@@ -741,7 +741,7 @@ def main():
                 language=args.language,
                 delay=args.delay,
                 max_retries=args.max_retries,
-                use_playwright_fallback=args.use_playwright_fallback
+                use_chrome-devtools_fallback=args.use_chrome-devtools_fallback
             )
 
             # Summary
@@ -751,13 +751,13 @@ def main():
         else:
             # Handle single video
             if args.output:
-                # Save to file (with Playwright fallback support)
+                # Save to file (with chrome-devtools fallback support)
                 save_transcript(
                     args.url,
                     args.output,
                     include_timestamps=args.timestamps,
                     language=args.language,
-                    use_playwright_fallback=args.use_playwright_fallback
+                    use_chrome-devtools_fallback=args.use_chrome-devtools_fallback
                 )
                 print(f"✓ Transcript saved to: {args.output}")
             else:

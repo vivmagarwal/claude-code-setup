@@ -36,7 +36,7 @@ from dataclasses import dataclass, field, asdict
 from enum import Enum
 from collections import deque
 
-from playwright.async_api import async_playwright, Page, Browser, BrowserContext
+from chrome-devtools.async_api import async_chrome-devtools, Page, Browser, BrowserContext
 from bs4 import BeautifulSoup
 import html2text
 
@@ -570,7 +570,7 @@ class BrowserController:
     
     def __init__(self, config: Config):
         self.config = config
-        self.playwright = None
+        self.chrome-devtools = None
         self.browser = None
         self.context = None
         self.authenticator = None
@@ -581,12 +581,12 @@ class BrowserController:
     
     async def start(self):
         """Initialize browser."""
-        self.playwright = await async_playwright().start()
+        self.chrome-devtools = await async_chrome-devtools().start()
         
         # Force headless=False if interactive auth is enabled
         headless = self.config.headless and not self.config.interactive_auth
         
-        self.browser = await self.playwright.chromium.launch(
+        self.browser = await self.chrome-devtools.chromium.launch(
             headless=headless,
             args=['--disable-blink-features=AutomationControlled']
         )
@@ -607,8 +607,8 @@ class BrowserController:
             await self.context.close()
         if self.browser:
             await self.browser.close()
-        if self.playwright:
-            await self.playwright.stop()
+        if self.chrome-devtools:
+            await self.chrome-devtools.stop()
     
     async def new_page(self) -> Page:
         """Create a new page."""
