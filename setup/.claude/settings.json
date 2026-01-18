@@ -1,11 +1,32 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"FYI: Today is $(date '+%A, %B %d, %Y at %I:%M %p %Z')\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "TodoWrite",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"Reminder: If you are using an engineering plan document, please ensure it is updated with the latest task status and notes.\""
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "afplay /System/Library/Sounds/Hero.aiff & say 'Task complete'"
+            "command": "afplay /System/Library/Sounds/Hero.aiff"
           }
         ]
       }
