@@ -1,22 +1,48 @@
 {
   "hooks": {
-    "SessionStart": [
+    "PreToolUse": [
       {
+        "matcher": "Read",
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"FYI: Today is $(date '+%A, %B %d, %Y at %I:%M %p %Z')\""
+            "command": "INPUT=$(cat); FILE=$(echo \"$INPUT\" | sed -n 's/.*\"file_path\"[[:space:]]*:[[:space:]]*\"\\([^\"]*\\)\".*/\\1/p'); if [ -n \"$FILE\" ] && echo \"$FILE\" | grep -qiE \"\\.(png|jpg|jpeg|webp|gif|bmp|tiff)$\" && [ -f \"$FILE\" ]; then W=$(sips -g pixelWidth \"$FILE\" 2>/dev/null | tail -1 | awk '{print $2}'); H=$(sips -g pixelHeight \"$FILE\" 2>/dev/null | tail -1 | awk '{print $2}'); if [ \"$W\" -gt 1900 ] 2>/dev/null || [ \"$H\" -gt 1900 ] 2>/dev/null; then CACHE=\"/tmp/claude-img-cache\"; mkdir -p \"$CACHE\"; HASH=$(echo \"$FILE\" | md5 | cut -c1-12); EXT=\"${FILE##*.}\"; OUT=\"$CACHE/${HASH}_1900.${EXT}\"; if [ ! -f \"$OUT\" ]; then cp \"$FILE\" \"$OUT\" && sips --resampleHeightWidthMax 1900 \"$OUT\" >/dev/null 2>&1; fi; echo \"{\\\"hookSpecificOutput\\\":{\\\"permissionDecision\\\":\\\"allow\\\",\\\"updatedInput\\\":{\\\"file_path\\\":\\\"$OUT\\\"}}}\"; exit 0; fi; fi; exit 0",
+            "timeout": 30000
           }
         ]
       }
     ],
     "PostToolUse": [
       {
+        "matcher": "mcp__chrome-devtools__take_screenshot",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); FILE=$(echo \"$INPUT\" | sed -n 's/.*\"filePath\"[[:space:]]*:[[:space:]]*\"\\([^\"]*\\)\".*/\\1/p'); if [ -n \"$FILE\" ] && [ -f \"$FILE\" ]; then W=$(sips -g pixelWidth \"$FILE\" 2>/dev/null | tail -1 | awk '{print $2}'); H=$(sips -g pixelHeight \"$FILE\" 2>/dev/null | tail -1 | awk '{print $2}'); if [ \"$W\" -gt 1900 ] 2>/dev/null || [ \"$H\" -gt 1900 ] 2>/dev/null; then sips --resampleHeightWidthMax 1900 \"$FILE\" >/dev/null 2>&1; echo \"{\\\"hookSpecificOutput\\\":{\\\"additionalContext\\\":\\\"Screenshot auto-resized from ${W}x${H} to ≤1900px\\\"}}\"; else echo \"{\\\"hookSpecificOutput\\\":{\\\"additionalContext\\\":\\\"Screenshot size OK: ${W}x${H}\\\"}}\"; fi; else echo \"{}\"; fi",
+            "timeout": 30000
+          }
+        ]
+      },
+      {
         "matcher": "TodoWrite",
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"Reminder: If you are using an engineering plan document, please ensure it is updated with the latest task status and notes.\""
+            "command": "echo '{\"hookSpecificOutput\":{\"additionalContext\":\"Reminder: If using an engineering plan document, ensure it is updated with the latest task status and notes.\"}}'"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"📅 Today is $(date '+%A, %B %d, %Y at %I:%M %p %Z')\""
+          },
+          {
+            "type": "command",
+            "command": "echo '📷 Image Safety Active: Screenshots auto-resized to ≤1900px. Use filePath for large viewports.'"
           }
         ]
       }
